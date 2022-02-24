@@ -5,21 +5,19 @@ body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.all-shows {
-  display: grid;
-  grid-template-columns: auto auto auto;
-  grid-gap: 5rem;
-}
-
 .search-container {
   text-align: left;
   grid-column: 1;
   margin-bottom: 2.5rem;
 }
 
+.search-input {
+  margin-left: 1.5rem;
+}
+
 .search-stats {
   display: inline;
-  margin-left: 2rem;
+  margin-left: 1.5rem;
 }
 
 .show {
@@ -44,4 +42,12 @@ body {
 .show-description {
   color: rgb(97, 97, 97);
   margin: 1rem 3rem;
+}
+
+@media screen and (min-width: 900px) {
+  .all-shows {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    grid-gap: 5rem;
+  }
 }
