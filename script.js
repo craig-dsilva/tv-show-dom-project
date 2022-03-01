@@ -4,7 +4,7 @@ const searchInput = document.createElement("input"); // Creates an input element
 const searchStats = document.createElement("p"); // Counts the number of episodes displayed
 const searchContainer = document.createElement("div");
 const allShows = document.createElement("div"); // A container which displays the episodes
-let totalEpisodes = getAllEpisodes().length; // Variable for the total number of episodes
+let totalEpisodes; // Variable for the total number of episodes
 
 // Adds classes to the elements
 searchContainer.classList.add("search-container");
@@ -19,32 +19,40 @@ searchContainer.appendChild(searchStats);
 rootElem.appendChild(searchContainer);
 rootElem.appendChild(allShows);
 
-// This function runs on loading
-function setup() {
-  const allEpisodes = getAllEpisodes();
-  makePageForEpisodes(allEpisodes);
+// This event listener goes to the show which is selected in the drop down
+dropdownEl.addEventListener("change", (event) => {
+  document.location = `index.html#${event.target.value}`;
+});
 
+// This function when the page is loaded
+function setup() {
+  fetch("https://api.tvmaze.com/shows/82/episodes")
+    .then((response) => response.json())
+    .then((data) => fetchedEpisodes(data))
+    .catch((error) => console.log(error));
+}
+
+// This function fetches all the episodes and filters them if needed
+function fetchedEpisodes(data) {
+  let episodeList = data;
+  totalEpisodes = data.length; // This is used in line 54 for displaying the total episodes count
   // This event listener filters the shows and is used in the event listener above
   searchInput.addEventListener("keyup", (event) => {
     const value = event.target.value.toLowerCase();
-    const filteredEpisodes = getAllEpisodes().filter((episode) => {
+    episodeList = data.filter((episode) => {
       return (
         episode.name.toLowerCase().includes(value) ||
         episode.summary.toLowerCase().includes(value)
       );
     });
-    makePageForEpisodes(filteredEpisodes);
+    makePageForEpisodes(episodeList); // Renders episodes according to the search input
   });
-
-  // This event listener goes to the show which is selected in the drop down
-  dropdownEl.addEventListener("change", (event) => {
-    document.location = `index.html#${event.target.value}`;
-  });
+  makePageForEpisodes(episodeList); // Renders all episodes
 }
 
 function makePageForEpisodes(episodeList) {
-  allShows.innerHTML = ""; // Clears the old list of shows
   searchStats.innerText = `Displaying ${episodeList.length} / ${totalEpisodes} episodes`; // Shows how many elements are rendered on the page
+  allShows.innerHTML = ""; // Clears the old list of shows
 
   // Loops through the episodeList and creates a card type container for each episode
   episodeList.forEach((show) => {
