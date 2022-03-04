@@ -11,7 +11,8 @@ body {
   margin-bottom: 2.5rem;
 }
 
-.search-input {
+.search-input,
+.episode-dropdown {
   margin-left: 1.5rem;
 }
 
@@ -20,32 +21,32 @@ body {
   margin-left: 1.5rem;
 }
 
-.show {
+.episode {
   background-color: #fff;
   border-radius: 15px;
 }
 
-.show-title-container {
+.episode-title-container {
   border: 1px solid #000;
   border-radius: 15px;
 }
 
-.show-title {
+.episode-title {
   font-weight: 600;
   font-size: 1.5em;
 }
 
-.show-thumbnail-container {
+.episode-thumbnail-container {
   margin: 2rem 5rem 0;
 }
 
-.show-description {
+.episode-description {
   color: rgb(97, 97, 97);
   margin: 1rem 3rem;
 }
 
 @media screen and (min-width: 900px) {
-  .all-shows {
+  .all-episodes {
     display: grid;
     grid-template-columns: auto auto auto;
     grid-gap: 5rem;
