@@ -1,62 +1,148 @@
-const rootElem = document.getElementById("root");
+const header = document.querySelector("#header");
+const main = document.querySelector("#main");
+const homeButton = document.createElement("h1");
 const showDropdownEl = document.createElement("select");
 const episodeDropdownEl = document.createElement("select");
-const searchInput = document.createElement("input"); // Creates an input element
-const searchStats = document.createElement("p"); // Counts the number of episodes displayed
-const searchContainer = document.createElement("div");
-const allShows = document.createElement("div"); // A container which displays the episodes
+const showSearchInput = document.createElement("input");
+const episodeSearchInput = document.createElement("input");
+const searchStats = document.createElement("p");
 let totalEpisodes; // Variable for the total number of episodes
+
+homeButton.innerText = "TV Show Dom Project"; // Text for the home button
 
 // Adds classes to the elements
 episodeDropdownEl.classList.add("episode-dropdown");
-searchContainer.classList.add("search-container");
-searchInput.classList.add("search-input");
+header.classList.add("header");
+showSearchInput.classList.add("show-search");
+episodeSearchInput.classList.add("episode-search");
 searchStats.classList.add("search-stats");
-allShows.classList.add("all-episodes");
+main.classList.add("main");
 
 // Appends the elements
-searchContainer.appendChild(showDropdownEl);
-searchContainer.appendChild(episodeDropdownEl);
-searchContainer.appendChild(searchInput);
-searchContainer.appendChild(searchStats);
-rootElem.appendChild(searchContainer);
-rootElem.appendChild(allShows);
+header.appendChild(homeButton);
+header.appendChild(showDropdownEl);
+header.appendChild(episodeDropdownEl);
+header.appendChild(episodeSearchInput);
+header.appendChild(showSearchInput);
+header.appendChild(searchStats);
+
+// When the home button is clicked this event listener is executed
+homeButton.addEventListener("click", () => {
+  main.innerHTML = "";
+  // Shows all the elements related to the shows
+  showDropdownEl.style.display = "inline";
+  main.classList.remove("all-episodes");
+  episodeDropdownEl.style.display = "";
+  searchStats.style.display = "";
+  episodeSearchInput.style.display = "";
+  showSearchInput.style.display = "inline";
+
+  fetchedShows(getAllShows());
+});
 
 // This event listener goes to the show which is selected in the drop down
+showDropdownEl.addEventListener("change", (event) => {
+  document.location = `index.html#${event.target.value}`;
+});
+
+// This event listener goes to the episode which is selected in the drop down
 episodeDropdownEl.addEventListener("change", (event) => {
   document.location = `index.html#${event.target.value}`;
 });
 
-// This function when the page is loaded
+// This function runs when the page is loaded
 function setup() {
-  fetchedShows(getAllShows());
-  // fetch("https://api.tvmaze.com/shows")
-  //   .then((response) => response.json())
-  //   .then((data) => fetchedShows(data))
-  //   .catch((error) => console.log(error));
+  let allShows = getAllShows();
+
+  showSearchInput.addEventListener("keyup", (event) => {
+    const value = event.target.value.toLowerCase();
+    allShows = getAllShows().filter((show) => {
+      return (
+        show.name.toLowerCase().includes(value) ||
+        show.summary.toLowerCase().includes(value)
+      );
+    });
+    fetchedShows(allShows);
+  });
+  fetchedShows(allShows);
 }
 
 // This fetches the shows
 function fetchedShows(data) {
-  data.forEach((show) => {
-    const optionEl = document.createElement("option");
-    optionEl.value = show.id;
-    optionEl.innerText = show.name;
-    showDropdownEl.appendChild(optionEl);
+  main.innerHTML = "";
+  let sortedData = data.sort((a, b) => a.name.localeCompare(b.name)); // Sorts the shows alphabetically
 
-    fetch(`https://api.tvmaze.com/shows/${1632}/episodes`)
-      .then((response) => response.json())
-      .then((data) => fetchedEpisodes(data))
-      .catch((error) => console.log(error));
-  });
+  // Loops through each show element and creates a container with information for it
+  sortedData.forEach((show) => {
+    const showId = show.name
+      .toLowerCase()
+      .replaceAll(",", "")
+      .replaceAll(" ", "-");
 
-  // This event listener fetches the episodes from the show which is selected in the dropdown
-  showDropdownEl.addEventListener("change", (event) => {
-    const showId = event.target.value;
-    fetch(`https://api.tvmaze.com/shows/${showId}/episodes`)
-      .then((response) => response.json())
-      .then((data) => fetchedEpisodes(data))
-      .catch((error) => console.log(error));
+    // Creates a dropdown for the shows in the header
+    const showOptionEl = document.createElement("option");
+    showOptionEl.value = showId;
+    showOptionEl.innerText = show.name;
+    showDropdownEl.appendChild(showOptionEl);
+
+    const showDiv = document.createElement("div");
+    const showTitle = document.createElement("h3");
+    const showThumbnail = document.createElement("img");
+    const showSummary = document.createElement("div");
+
+    const showStats = document.createElement("div");
+    const showRating = document.createElement("p");
+    const showGenres = document.createElement("p");
+    const showStatus = document.createElement("p");
+    const showRuntime = document.createElement("p");
+
+    showTitle.classList.add("show-title");
+    showDiv.classList.add("show");
+    showThumbnail.classList.add("show-thumbnail");
+    showSummary.classList.add("show-summary");
+    showStats.classList.add("show-stats");
+
+    showDiv.id = showId;
+
+    showTitle.innerText = show.name;
+    showThumbnail.src = show.image ? show.image.medium : ""; // handles if the link is broken or missing
+    showSummary.innerHTML = show.summary;
+
+    showRating.innerText = `Rated: ${show.rating.average}`;
+    showGenres.innerText = `Genres: ${show.genres}`;
+    showStatus.innerText = `Status: ${show.status}`;
+    showRuntime.innerText = `Runtime: ${show.runtime} minutes`;
+
+    showDiv.appendChild(showTitle);
+    showDiv.appendChild(showThumbnail);
+    showDiv.appendChild(showSummary);
+    showDiv.appendChild(showStats);
+
+    showStats.appendChild(showRating);
+    showStats.appendChild(showGenres);
+    showStats.appendChild(showStatus);
+    showStats.appendChild(showRuntime);
+
+    main.appendChild(showDiv);
+
+    let clickElements = [showTitle, showThumbnail]; // An array which contains the elements which listen to clicks
+
+    // Loops through the above array
+    clickElements.forEach((element) => {
+      // This shows all the episode for the selected show
+      element.addEventListener("click", () => {
+        // Hides the elements related to displaying all the shows
+        showDropdownEl.style.display = "none";
+        episodeDropdownEl.style.display = "inline";
+        episodeSearchInput.style.display = "inline";
+        showSearchInput.style.display = "none";
+        searchStats.style.display = "inline";
+        fetch(`https://api.tvmaze.com/shows/${show.id}/episodes`)
+          .then((response) => response.json())
+          .then((data) => fetchedEpisodes(data))
+          .catch((error) => console.log(error));
+      });
+    });
   });
 }
 
@@ -66,7 +152,7 @@ function fetchedEpisodes(data) {
   totalEpisodes = data.length;
 
   // This event listener filters the shows
-  searchInput.addEventListener("keyup", (event) => {
+  episodeSearchInput.addEventListener("keyup", (event) => {
     const value = event.target.value.toLowerCase();
     episodeList = data.filter((episode) => {
       return (
@@ -81,11 +167,13 @@ function fetchedEpisodes(data) {
 
 function makePageForEpisodes(episodeList) {
   searchStats.innerText = `Displaying ${episodeList.length} / ${totalEpisodes} episodes`; // Shows how many elements are rendered on the page
-  allShows.innerHTML = ""; // Clears the old list of shows
+  main.innerHTML = ""; // Clears the old list of shows
   episodeDropdownEl.innerHTML = ""; // Clears the old show's select element
+  main.classList.add("all-episodes");
 
   // Loops through the episodeList and creates a card type container for each episode
   episodeList.forEach((episode) => {
+    console.log(episode);
     // The season and episode number with '0' appended to it
     const season = episode.season.toString().padStart(2, "0");
     const episodeNo = episode.number.toString().padStart(2, "0");
@@ -104,7 +192,7 @@ function makePageForEpisodes(episodeList) {
     const episodeContainer = document.createElement("div");
     episodeContainer.classList.add("episode");
     episodeContainer.id = episodeId;
-    allShows.appendChild(episodeContainer);
+    main.appendChild(episodeContainer);
 
     const episodeTitleContainer = document.createElement("div");
     episodeTitleContainer.classList.add("episode-title-container");
