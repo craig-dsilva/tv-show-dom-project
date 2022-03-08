@@ -59,7 +59,8 @@ function setup() {
     allShows = getAllShows().filter((show) => {
       return (
         show.name.toLowerCase().includes(value) ||
-        show.summary.toLowerCase().includes(value)
+        show.summary.toLowerCase().includes(value) ||
+        show.genres.forEach((genre) => genre.toLowerCase().includes(value))
       );
     });
     fetchedShows(allShows);
@@ -136,11 +137,14 @@ function fetchedShows(data) {
         episodeDropdownEl.style.display = "inline";
         episodeSearchInput.style.display = "inline";
         showSearchInput.style.display = "none";
-        searchStats.style.display = "inline";
+        searchStats.style.display = "block";
+
         fetch(`https://api.tvmaze.com/shows/${show.id}/episodes`)
           .then((response) => response.json())
           .then((data) => fetchedEpisodes(data))
           .catch((error) => console.log(error));
+
+        window.scrollTo(0, 0);
       });
     });
   });
@@ -173,7 +177,6 @@ function makePageForEpisodes(episodeList) {
 
   // Loops through the episodeList and creates a card type container for each episode
   episodeList.forEach((episode) => {
-    console.log(episode);
     // The season and episode number with '0' appended to it
     const season = episode.season.toString().padStart(2, "0");
     const episodeNo = episode.number.toString().padStart(2, "0");

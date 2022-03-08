@@ -2,7 +2,7 @@ body {
   background-color: rgb(218, 218, 218);
   text-align: center;
   font-size: 20px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Sansita Swashed", cursive;
   margin: 0;
 }
 
@@ -21,17 +21,6 @@ body {
 }
 
 .episode-search {
-  display: none;
-}
-
-.episode-search,
-.episode-dropdown,
-.show-search {
-  margin-left: 1.5rem;
-}
-
-.search-stats {
-  margin-left: 1.5rem;
   display: none;
 }
 
@@ -69,11 +58,22 @@ body {
   .main {
     margin: 2.5em;
   }
+
+  .episode-search,
+  .show-search {
+    margin-left: 1.5rem;
+  }
+
+  .search-stats {
+    display: none;
+  }
+
   .all-episodes {
     display: grid;
     grid-template-columns: auto auto auto;
     grid-gap: 5rem;
   }
+
   .show {
     display: grid;
     grid-template-columns: auto 2fr 25rem;
@@ -81,9 +81,11 @@ body {
     grid-gap: 2em;
     text-align: left;
   }
+
   .show-title {
     grid-column: 1 / 4;
   }
+
   .show-thumbnail {
     grid-row: 2;
   }
@@ -92,5 +94,11 @@ body {
     border: 1px solid #000;
     grid-column: 3;
     padding: 2em;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .show-search {
+    margin-left: 0;
   }
 }
